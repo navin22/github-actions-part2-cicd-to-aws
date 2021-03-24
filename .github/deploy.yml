@@ -1,0 +1,46 @@
+# This is a basic workflow to help you get started with Actions
+
+name: CI
+
+env:
+  BUCKET_NAME: 'neha-bucket123'
+  APP_NAME: 'neha-app'
+  ENV_NAME: 'Nehaapp-env'
+  PACKAGE_NAME: 'neha-${{ github.sha }}.zip'
+  AWS_REGION: 'us-east-2'
+
+# Controls when the action will run. 
+on:
+  # Triggers the workflow on push or pull request events but only for the master branch
+  push:
+    branches: [ master ]
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  my-ci-pipeline:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+
+      # Runs a single command using the runners shell
+      - name: Create zip
+        run: zip -r ${{ env.PACKAGE_NAME }} ./ -x "*.git"
+
+      # Runs a set of commands using the runners shell
+      - name: configure aws credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key: ${{ secrets.MY_AWS_ACCESS_KEY }}
+          aws-access-secret: ${{ secrets.MY_AWS_ACCESS_SECRET }}
+          aws-region: ${{ env.AWS_REGION }}
+          
+      - name:  Copy package to s3
+        run: aws s3 cp ${{ env.PACKAGE_NAME }} s3://${{ BUCKET_NAME }}/
+        
+      - name: completion message
+        run: echo "CI completed successfully"
