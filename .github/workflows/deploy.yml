@@ -42,7 +42,8 @@ jobs:
         id: credentials
         
       - name: get access ID
-        run: echo "'AccessKeyId':'ASIASGPIDYNP7S6D5V6L'" | jq -rc '.AccessKeyId'
+      #$ echo '{"foo":"bar"}' | jq '.foo'
+        run: echo '{"AccessKeyId":"ASIASGPIDYNP7S6D5V6L"}' | jq -rc '.AccessKeyId'
         id: accessid
       # Runs a set of commands using the runners shell
 #      - name: configure aws credentials
