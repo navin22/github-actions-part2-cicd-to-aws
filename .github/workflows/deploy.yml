@@ -32,12 +32,12 @@ jobs:
         id: tokenid
       # Get credentials
       - name: get temp credentials
-        run: echo ::set-output name=CREDENTIALS::$(aws sts assume-role-with-web-identity  --role-arn 'arn:aws:iam::151347512159:role/TestOIDCRole' --role-session-name 'samplerolesession' --web-identity-token ${{ steps.version.outputs.IDTOKEN }} --query Credentials)
-      
+        run: echo ::set-output name=CREDENTIALS::$(aws sts assume-role-with-web-identity  --role-arn 'arn:aws:iam::151347512159:role/TestOIDCRole' --role-session-name 'samplerolesession' --web-identity-token ${{ steps.tokenid.outputs.IDTOKEN }} --query Credentials)
+        id: credentials
 
 
  
       - name: Print nice message on completion of CD Pipeline
-        run : echo "CD Pipeline part finished successfully ${{ steps.tokenid.outputs.IDTOKEN }}  "
+        run : echo "CD Pipeline part finished successfully ${{ steps.credentials.outputs.CREDENTIALS }}  "
     
 
