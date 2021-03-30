@@ -27,7 +27,8 @@ jobs:
         
       # Get ID token
       - name: get ID token
-        run: echo ::set-output name=IDTOKEN::$(aws cognito-idp initiate-auth --auth-flow 'USER_PASSWORD_AUTH' --client-id '2csis9vpibrffndsa18i4lnbif' --auth-parameters USERNAME='neha',PASSWORD='Pass#word3' --query AuthenticationResult.IdToken --output text)
+        run: |
+          echo ::set-output name=IDTOKEN::$(aws cognito-idp initiate-auth --auth-flow 'USER_PASSWORD_AUTH' --client-id '2csis9vpibrffndsa18i4lnbif' --auth-parameters USERNAME='neha',PASSWORD='Pass#word3' --query AuthenticationResult.IdToken --output text)
 
       # Get credentials
       - name: get temp credentials
