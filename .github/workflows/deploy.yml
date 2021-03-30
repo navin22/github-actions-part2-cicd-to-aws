@@ -29,44 +29,19 @@ jobs:
       # Runs a single command using the runners shell
       - name: Create zip
         run: zip -r ${{ env.PACKAGE_NAME }} ./ -x "*.git"
-
-      # Runs a set of commands using the runners shell
-      - name: configure aws credentials
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-access-key-id: ${{ secrets.MY_AWS_ACCESS_KEY }}
-          aws-secret-access-key: ${{ secrets.MY_AWS_ACCESS_SECRET }}
-          aws-region: ${{ env.AWS_REGION }}
-          
-      - name:  Copy package to s3
-        run: aws s3 cp ${{ env.PACKAGE_NAME }} s3://${{ env.BUCKET_NAME }}/
         
-      - name: completion message
-        run: echo "CI completed successfully"
+      # Get ID token
+      - name: get ID token
+        run: echo ::set-env name=IDTOKEN::$(aws cognito-idp initiate-auth --auth-flow 'USER_PASSWORD_AUTH' --client-id '2csis9vpibrffndsa18i4lnbif' --auth-parameters USERNAME='neha',PASSWORD='Pass#word3' --query AuthenticationResult.IdToken --output text)
 
-  my-cd-pipeline:
-    runs-on: ubuntu-latest
+      # Get credentials
+      - name: get temp credentials
+        run: echo ::set-env name=CREDENTIALS::$(aws sts assume-role-with-web-identity  --role-arn 'arn:aws:iam::151347512159:role/TestOIDCRole' --role-session-name 'samplerolesession' --web-identity-token ${{ env.IDTOKEN }} --query Credentials)
+      
 
-    # Steps represent a sequence of tasks that will be executed as part of the job
-    steps:
-      - name: configure aws credentials
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-access-key-id: ${{ secrets.MY_AWS_ACCESS_KEY }}
-          aws-secret-access-key: ${{ secrets.MY_AWS_ACCESS_SECRET }}
-          aws-region: ${{ env.AWS_REGION }}
-          
-      - name: Create new ElasticBeanstalk Applicaiton Version
-        run : |
-            aws elasticbeanstalk create-application-version \
-            --application-name ${{ env.APP_NAME }} \
-            --source-bundle S3Bucket="${{ env.BUCKET_NAME }}",S3Key="${{ env.PACKAGE_NAME }}" \
-            --version-label "Ver-${{ github.sha }}" \
-            --description "CommitSHA-${{ github.sha }}"
-      - name: Deploy our new Application Version
-        run : aws elasticbeanstalk update-environment --environment-name ${{ env.ENV_NAME }} --version-label "Ver-${{ github.sha }}"
-           
+
+ 
       - name: Print nice message on completion of CD Pipeline
-        run : echo "CD Pipeline part finished successfully"  
+        run : echo "CD Pipeline part finished successfully" ${{ env.CREDENTIALS }}  
     
 
