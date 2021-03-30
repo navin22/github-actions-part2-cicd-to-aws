@@ -42,9 +42,16 @@ jobs:
         id: credentials
         
       - name: get access ID
-      #$ echo '{"foo":"bar"}' | jq '.foo'
         run: echo ::set-output name=ACCESSID::$(echo '${{ steps.credentials.outputs.CREDENTIALS }}' | jq -rc '.AccessKeyId')
         id: accessid
+        
+      - name: get access key
+        run: echo ::set-output name=ACCESSKEY::$(echo '${{ steps.credentials.outputs.CREDENTIALS }}' | jq -rc '.SecretAccessKey')
+        id: accesskey
+        
+      - name: get session token
+        run: echo ::set-output name=SESSIONTOKEN::$(echo '${{ steps.credentials.outputs.CREDENTIALS }}' | jq -rc '.SessionToken')
+        id: sessiontoken
       # Runs a set of commands using the runners shell
 #      - name: configure aws credentials
  #       uses: aws-actions/configure-aws-credentials@v1
@@ -63,6 +70,6 @@ jobs:
 
  
       - name: Print nice message on completion of CD Pipeline
-        run : echo "CD Pipeline part finished successfully ${{ steps.accessid.outputs.ACCESSID }}  "
+        run : echo "CD Pipeline part finished successfully ${{ steps.accessid.outputs.ACCESSID }} - ${{ steps.accesskey.outputs.ACCESSKEY }} - ${{ steps.sessiontoken.outputs.SESSIONTOKEN }} "
     
 
