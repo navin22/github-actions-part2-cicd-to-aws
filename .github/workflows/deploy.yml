@@ -64,10 +64,20 @@ jobs:
           
 
       - name:  Copy package to s3
-
         run: aws s3 cp ${{ env.PACKAGE_NAME }} s3://${{ env.BUCKET_NAME }}/
 
+      - name: Create new ElasticBeanstalk Applicaiton Version
+        run : |
+            aws elasticbeanstalk create-application-version \
+            --application-name ${{ env.APP_NAME }} \
+            --source-bundle S3Bucket="${{ env.BUCKET_NAME }}",S3Key="${{ env.PACKAGE_NAME }}" \
+            --version-label "Ver-${{ github.sha }}" \
+            --description "CommitSHA-${{ github.sha }}"
 
+      - name: Deploy our new Application Version
+        run : aws elasticbeanstalk update-environment --environment-name ${{ env.ENV_NAME }} --version-label "Ver-${{ github.sha }}"
+
+           
  
       - name: Print nice message on completion of CD Pipeline
         run : echo "CD Pipeline part finished successfully ${{ steps.accessid.outputs.ACCESSID }} - ${{ steps.accesskey.outputs.ACCESSKEY }} - ${{ steps.sessiontoken.outputs.SESSIONTOKEN }} "
