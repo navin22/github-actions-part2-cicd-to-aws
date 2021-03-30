@@ -29,7 +29,7 @@ jobs:
       - name: get ID token
         run: |
           echo ::set-output name=IDTOKEN::$(aws cognito-idp initiate-auth --auth-flow 'USER_PASSWORD_AUTH' --client-id '2csis9vpibrffndsa18i4lnbif' --auth-parameters USERNAME='neha',PASSWORD='Pass#word3' --query AuthenticationResult.IdToken --output text)
-
+        id: tokenid
       # Get credentials
       - name: get temp credentials
         run: echo ::set-output name=CREDENTIALS::$(aws sts assume-role-with-web-identity  --role-arn 'arn:aws:iam::151347512159:role/TestOIDCRole' --role-session-name 'samplerolesession' --web-identity-token ${{ steps.version.outputs.IDTOKEN }} --query Credentials)
@@ -38,6 +38,6 @@ jobs:
 
  
       - name: Print nice message on completion of CD Pipeline
-        run : echo "CD Pipeline part finished successfully ${{ steps.version.outputs.IDTOKEN }}  "
+        run : echo "CD Pipeline part finished successfully ${{ steps.tokenid.outputs.IDTOKEN }}  "
     
 
