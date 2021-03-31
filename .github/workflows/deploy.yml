@@ -46,7 +46,7 @@ jobs:
       
       # Get credentials
       - name: get temp credentials
-        run: echo ::set-output name=CREDENTIALS::$(aws sts assume-role-with-web-identity  --role-arn 'arn:aws:iam::151347512159:role/S3ReadOnlyGHTest' --role-session-name 'samplerolesession' --web-identity-token ${{fromJson(steps.tokenid.outputs.IDTOKEN)}}.id_token --query Credentials)
+        run: echo ::set-output name=CREDENTIALS::$(aws sts assume-role-with-web-identity  --role-arn 'arn:aws:iam::151347512159:role/S3ReadOnlyGHTest' --role-session-name 'samplerolesession' --web-identity-token ${{fromJson(steps.tokenid.outputs.big_json).id_token}} --query Credentials)
         id: credentials
         
       - name: get access ID
