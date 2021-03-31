@@ -33,12 +33,16 @@ jobs:
       # Get ID token
       - name: get ID token
         run: |
-          echo ::set-output name=IDTOKEN::$(aws cognito-idp initiate-auth --auth-flow 'USER_PASSWORD_AUTH' --client-id '${{ secrets.CLIENT_ID }}' --auth-parameters USERNAME='${{ secrets.GITREPO_USERNAME }}',PASSWORD='${{ secrets.GITREPO_PWD }}' --query AuthenticationResult.IdToken --output text)
+          echo ::set-output name=IDTOKEN::$(curl -i -X POST \
+          -H "Content-Type:application/x-www-form-urlencoded" \
+          -d \
+          'grant_type=password&client_id=ghactions&username=root&password=HelloWorld123#&scope=openid&client_secret=helloworld' \
+           'https://ghactionsoidc.azurewebsites.net/connect/token/')
         id: tokenid
       
       # Get credentials
       - name: get temp credentials
-        run: echo ::set-output name=CREDENTIALS::$(aws sts assume-role-with-web-identity  --role-arn 'arn:aws:iam::151347512159:role/TestOIDCRole' --role-session-name 'samplerolesession' --web-identity-token ${{ steps.tokenid.outputs.IDTOKEN }} --query Credentials)
+        run: echo ::set-output name=CREDENTIALS::$(aws sts assume-role-with-web-identity  --role-arn 'arn:aws:iam::151347512159:role/S3ReadOnlyGHTest' --role-session-name 'samplerolesession' --web-identity-token ${{ steps.tokenid.outputs.id_token }} --query Credentials)
         id: credentials
         
       - name: get access ID
@@ -60,8 +64,6 @@ jobs:
           aws-secret-access-key: ${{ steps.accesskey.outputs.ACCESSKEY }}
           aws-session-token: ${{ steps.sessiontoken.outputs.SESSIONTOKEN }}
           aws-region: ${{ env.AWS_REGION }}
-
-          
 
       - name:  Copy package to s3
         run: aws s3 cp ${{ env.PACKAGE_NAME }} s3://${{ env.BUCKET_NAME }}/
