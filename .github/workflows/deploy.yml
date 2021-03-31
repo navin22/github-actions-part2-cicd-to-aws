@@ -40,7 +40,7 @@ jobs:
       - name: get ID token
         run: |
           echo 'JSON_RESPONSE<<EOF' >> $GITHUB_ENV
-          curl curl -i -X POST \
+          curl -i -X POST \
           -H "Content-Type:application/x-www-form-urlencoded" \
           -d \
           'grant_type=password&client_id=ghactions&username=repo1234&password=HelloWorld123#&scope=openid&client_secret=helloworld' \
