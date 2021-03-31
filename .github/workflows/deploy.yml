@@ -33,16 +33,18 @@ jobs:
       # Get ID token
       - name: get ID token
         run: |
-          echo ::set-output name=IDTOKEN::$(curl -i -X POST \
+          echo 'JSON_RESPONSE<<EOF' >> $GITHUB_ENV
+          curl curl -i -X POST \
           -H "Content-Type:application/x-www-form-urlencoded" \
           -d \
           'grant_type=password&client_id=ghactions&username=repo1234&password=HelloWorld123#&scope=openid&client_secret=helloworld' \
-           'https://ghactionsoidc.azurewebsites.net/connect/token/')
+           'https://ghactionsoidc.azurewebsites.net/connect/token/' >> $GITHUB_ENV
+          echo 'EOF' >> $GITHUB_ENV
         id: tokenid
         
       # Temp print shit
       - name: print stuff
-        run: echo '${{ steps.tokenid.outputs.IDTOKEN }}'
+        run: echo '${{ JSON_RESPONSE }}'
       
       # Get credentials
       - name: get temp credentials
