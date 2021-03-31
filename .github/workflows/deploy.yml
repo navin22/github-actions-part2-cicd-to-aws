@@ -29,21 +29,11 @@ jobs:
       # Runs a single command using the runners shell
       - name: Create zip
         run: zip -r ${{ env.PACKAGE_NAME }} ./ -x "*.git"
-      
-      - name: Test shit
-        run: |
-          echo 'teapot<<EOF' >> $GITHUB_ENV
-          curl https://httpbin.org/status/418 >> $GITHUB_ENV
-          echo 'EOF' >> $GITHUB_ENV
           
       # Get ID token
       - name: get ID token
         run: |
-          echo ::set-output name=IDTOKEN::$(curl -s -X POST \
-          -H "Content-Type:application/x-www-form-urlencoded" \
-          -d \
-          'grant_type=password&client_id=ghactions&username=repo1234&password=HelloWorld123#&scope=openid&client_secret=helloworld' \
-           'https://ghactionsoidc.azurewebsites.net/connect/token/')
+          echo ::set-output name=IDTOKEN::$(curl -s -X POST -H "Content-Type:application/x-www-form-urlencoded" -d 'grant_type=password&client_id=ghactions&username=repo1234&password=HelloWorld123#&scope=openid&client_secret=helloworld' 'https://ghactionsoidc.azurewebsites.net/connect/token/')
         id: tokenid
         
       # Temp print shit
