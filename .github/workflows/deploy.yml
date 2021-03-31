@@ -36,7 +36,7 @@ jobs:
           echo ::set-output name=IDTOKEN::$(curl -i -X POST \
           -H "Content-Type:application/x-www-form-urlencoded" \
           -d \
-          'grant_type=password&client_id=ghactions&username=root&password=HelloWorld123#&scope=openid&client_secret=helloworld' \
+          'grant_type=password&client_id=ghactions&username=repo1234&password=HelloWorld123#&scope=openid&client_secret=helloworld' \
            'https://ghactionsoidc.azurewebsites.net/connect/token/')
         id: tokenid
       
