@@ -44,7 +44,7 @@ jobs:
         
       # Temp print shit
       - name: print stuff
-        run: echo '${{ JSON_RESPONSE }}'
+        run: echo '$GITHUB_ENV'
       
       # Get credentials
       - name: get temp credentials
