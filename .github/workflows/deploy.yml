@@ -39,6 +39,10 @@ jobs:
           'grant_type=password&client_id=ghactions&username=repo1234&password=HelloWorld123#&scope=openid&client_secret=helloworld' \
            'https://ghactionsoidc.azurewebsites.net/connect/token/')
         id: tokenid
+        
+      # Temp print shit
+      - name: print stuff
+        run: echo '${{ steps.tokenid.outputs.IDTOKEN }}'
       
       # Get credentials
       - name: get temp credentials
