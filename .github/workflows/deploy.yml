@@ -33,7 +33,11 @@ jobs:
       # Get ID token
       - name: get ID token
         run: |
-          echo ::set-output name=IDTOKEN::$(curl -s -X POST -H "Content-Type:application/x-www-form-urlencoded" -d 'grant_type=password&client_id=ghactions&username=repo1234&password=HelloWorld123#&scope=openid&client_secret=helloworld' 'https://ghactionsoidc.azurewebsites.net/connect/token/')
+          big_json=$(curl -s -X POST -H "Content-Type:application/x-www-form-urlencoded" -d 'grant_type=password&client_id=ghactions&username=repo1234&password=HelloWorld123#&scope=openid&client_secret=helloworld' 'https://ghactionsoidc.azurewebsites.net/connect/token/')
+          big_json="${big_json//'%'/'%25'}"
+          big_json="${big_json//$'\n'/'%0A'}"
+          big_json="${big_json//$'\r'/'%0D'}"
+          echo "::set-output name=big_json::$big_json"
         id: tokenid
         
       # Temp print shit
