@@ -1,10 +1,10 @@
 
 name: CI
 env:
-  BUCKET_NAME : "navin-bucket123"
-  APP_NAME : "navin-app"
-  ENV_NAME : "navin-env"
-  PACKAGE_NAME : "navin-${{ github.sha }}.zip"
+  BUCKET_NAME : "neha-bucket123"
+  APP_NAME : "neha-app"
+  ENV_NAME : "neha-env"
+  PACKAGE_NAME : "neha-${{ github.sha }}.zip"
   AWS_REGION : "us-east-2"
 
 on:
