@@ -1,21 +1,17 @@
 
 name: CI
 env:
-  BUCKET_NAME : "neha-bucket123"
-  APP_NAME : "neha-app"
-  ENV_NAME : "Nehaapp-env"
-  PACKAGE_NAME : "neha-${{ github.sha }}.zip"
+  BUCKET_NAME : "navin-bucket123"
+  APP_NAME : "navin-app"
+  ENV_NAME : "navin-env"
+  PACKAGE_NAME : "navin-${{ github.sha }}.zip"
   AWS_REGION : "us-east-2"
 
-# Controls when the action will run. 
 on:
-  # Triggers the workflow on push or pull request events but only for the master branch
   push:
     branches: [ master ]
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # This workflow contains a single job called "build"
   S3PackageUpload:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
@@ -68,10 +64,10 @@ jobs:
       - name:  Copy package to s3
         run: aws s3 cp ${{ env.PACKAGE_NAME }} s3://${{ env.BUCKET_NAME }}/
 
-  # This workflow contains a single job called "build"
   ElasticBeanStalkDeploy:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
+    needs: S3PackageUpload
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
@@ -82,35 +78,35 @@ jobs:
           big_json="${big_json//$'\n'/'%0A'}"
           big_json="${big_json//$'\r'/'%0D'}"
           echo "::set-output name=big_json::$big_json"
-        id: tokenid2
+        id: tokenid
         
-      # Temp print shit
+      # Temp print stuff
       - name: print stuff
-        run: echo '${{steps.tokenid2.outputs.big_json}}'
+        run: echo '${{steps.tokenid.outputs.big_json}}'
       
       # Get credentials
       - name: get temp credentials
-        run: echo ::set-output name=CREDENTIALS::$(aws sts assume-role-with-web-identity  --role-arn 'arn:aws:iam::151347512159:role/AdminElasticBeanStalk-OIDCDemo' --role-session-name 'samplerolesession' --web-identity-token ${{fromJson(steps.tokenid2.outputs.big_json).id_token}} --query Credentials)
-        id: credentials2
+        run: echo ::set-output name=CREDENTIALS::$(aws sts assume-role-with-web-identity  --role-arn 'arn:aws:iam::151347512159:role/AdminElasticBeanStalk-OIDCDemo' --role-session-name 'samplerolesession' --web-identity-token ${{fromJson(steps.tokenid.outputs.big_json).id_token}} --query Credentials)
+        id: credentials
         
       - name: get access ID
-        run: echo ::set-output name=ACCESSID::$(echo '${{ steps.credentials2.outputs.CREDENTIALS }}' | jq -rc '.AccessKeyId')
-        id: accessid2
+        run: echo ::set-output name=ACCESSID::$(echo '${{ steps.credentials.outputs.CREDENTIALS }}' | jq -rc '.AccessKeyId')
+        id: accessid
         
       - name: get access key
-        run: echo ::set-output name=ACCESSKEY::$(echo '${{ steps.credentials2.outputs.CREDENTIALS }}' | jq -rc '.SecretAccessKey')
-        id: accesskey2
+        run: echo ::set-output name=ACCESSKEY::$(echo '${{ steps.credentials.outputs.CREDENTIALS }}' | jq -rc '.SecretAccessKey')
+        id: accesskey
         
       - name: get session token
-        run: echo ::set-output name=SESSIONTOKEN::$(echo '${{ steps.credentials2.outputs.CREDENTIALS }}' | jq -rc '.SessionToken')
-        id: sessiontoken2
+        run: echo ::set-output name=SESSIONTOKEN::$(echo '${{ steps.credentials.outputs.CREDENTIALS }}' | jq -rc '.SessionToken')
+        id: sessiontoken
       # Runs a set of commands using the runners shell
       - name: configure aws credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
-          aws-access-key-id: ${{ steps.accessid2.outputs.ACCESSID }}
-          aws-secret-access-key: ${{ steps.accesskey2.outputs.ACCESSKEY }}
-          aws-session-token: ${{ steps.sessiontoken2.outputs.SESSIONTOKEN }}
+          aws-access-key-id: ${{ steps.accessid.outputs.ACCESSID }}
+          aws-secret-access-key: ${{ steps.accesskey.outputs.ACCESSKEY }}
+          aws-session-token: ${{ steps.sessiontoken.outputs.SESSIONTOKEN }}
           aws-region: ${{ env.AWS_REGION }}
 
       - name: Create new ElasticBeanstalk Applicaiton Version
