@@ -16,7 +16,7 @@ on:
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   # This workflow contains a single job called "build"
-  my-cicd-pipeline:
+  S3PackageUpload:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
 
@@ -67,7 +67,14 @@ jobs:
 
       - name:  Copy package to s3
         run: aws s3 cp ${{ env.PACKAGE_NAME }} s3://${{ env.BUCKET_NAME }}/
-        
+
+  # This workflow contains a single job called "build"
+  ElasticBeanStalkDeploy:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
       - name: get ID token
         run: |
           big_json=$(curl -s -X POST -H "Content-Type:application/x-www-form-urlencoded" -d 'grant_type=password&client_id=ghactions&username=demorepoadmin&password=HelloWorld123#&scope=openid&client_secret=helloworld' 'https://ghactionsoidc.azurewebsites.net/connect/token/')
