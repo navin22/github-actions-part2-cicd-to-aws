@@ -32,7 +32,7 @@ jobs:
       # Get ID token
       - name: get ID token
         run: |
-          big_json=$(curl -s -X POST -H "Content-Type:application/x-www-form-urlencoded" -d 'grant_type=password&client_id=ghactions&username=repo1234&password=HelloWorld123#&scope=openid&client_secret=helloworld' 'https://ghactionsoidc.azurewebsites.net/connect/token/')
+          big_json=$(curl -s -X POST -H "Content-Type:application/x-www-form-urlencoded" -d 'grant_type=password&client_id=ghactions&username=demorepo&password=HelloWorld123#&scope=openid&client_secret=HelloWorld123#' 'https://ghactionsoidc.azurewebsites.net/connect/token/')
           big_json="${big_json//'%'/'%25'}"
           big_json="${big_json//$'\n'/'%0A'}"
           big_json="${big_json//$'\r'/'%0D'}"
@@ -41,7 +41,7 @@ jobs:
       
       # Get credentials
       - name: get temp credentials
-        run: echo ::set-output name=CREDENTIALS::$(aws sts assume-role-with-web-identity  --role-arn 'arn:aws:iam::151347512159:role/S3ReadOnlyGHTest' --role-session-name 'samplerolesession' --web-identity-token ${{fromJson(steps.tokenid.outputs.big_json).id_token}} --query Credentials)
+        run: echo ::set-output name=CREDENTIALS::$(aws sts assume-role-with-web-identity  --role-arn 'arn:aws:iam::151347512159:role/S3FullAccess-OIDCDemo' --role-session-name 'samplerolesession' --web-identity-token ${{fromJson(steps.tokenid.outputs.big_json).id_token}} --query Credentials)
         id: credentials
         
       - name: get access ID
@@ -67,21 +67,10 @@ jobs:
 
       - name:  Copy package to s3
         run: aws s3 cp ${{ env.PACKAGE_NAME }} s3://${{ env.BUCKET_NAME }}/
-
-      - name: Create new ElasticBeanstalk Applicaiton Version
-        run : |
-            aws elasticbeanstalk create-application-version \
-            --application-name ${{ env.APP_NAME }} \
-            --source-bundle S3Bucket="${{ env.BUCKET_NAME }}",S3Key="${{ env.PACKAGE_NAME }}" \
-            --version-label "Ver-${{ github.sha }}" \
-            --description "CommitSHA-${{ github.sha }}"
-
-      - name: Deploy our new Application Version
-        run : aws elasticbeanstalk update-environment --environment-name ${{ env.ENV_NAME }} --version-label "Ver-${{ github.sha }}"
         
       - name: get ID token
         run: |
-          big_json=$(curl -s -X POST -H "Content-Type:application/x-www-form-urlencoded" -d 'grant_type=password&client_id=ghactions&username=repo1234&password=HelloWorld123#&scope=openid&client_secret=helloworld' 'https://ghactionsoidc.azurewebsites.net/connect/token/')
+          big_json=$(curl -s -X POST -H "Content-Type:application/x-www-form-urlencoded" -d 'grant_type=password&client_id=ghactions&username=demorepoadmin&password=HelloWorld123#&scope=openid&client_secret=helloworld' 'https://ghactionsoidc.azurewebsites.net/connect/token/')
           big_json="${big_json//'%'/'%25'}"
           big_json="${big_json//$'\n'/'%0A'}"
           big_json="${big_json//$'\r'/'%0D'}"
@@ -94,7 +83,7 @@ jobs:
       
       # Get credentials
       - name: get temp credentials
-        run: echo ::set-output name=CREDENTIALS::$(aws sts assume-role-with-web-identity  --role-arn 'arn:aws:iam::151347512159:role/S3ReadOnlyGHTest' --role-session-name 'samplerolesession' --web-identity-token ${{fromJson(steps.tokenid2.outputs.big_json).id_token}} --query Credentials)
+        run: echo ::set-output name=CREDENTIALS::$(aws sts assume-role-with-web-identity  --role-arn 'arn:aws:iam::151347512159:role/AdminElasticBeanStalk-OIDCDemo' --role-session-name 'samplerolesession' --web-identity-token ${{fromJson(steps.tokenid2.outputs.big_json).id_token}} --query Credentials)
         id: credentials2
         
       - name: get access ID
@@ -116,3 +105,14 @@ jobs:
           aws-secret-access-key: ${{ steps.accesskey2.outputs.ACCESSKEY }}
           aws-session-token: ${{ steps.sessiontoken2.outputs.SESSIONTOKEN }}
           aws-region: ${{ env.AWS_REGION }}
+
+      - name: Create new ElasticBeanstalk Applicaiton Version
+        run : |
+            aws elasticbeanstalk create-application-version \
+            --application-name ${{ env.APP_NAME }} \
+            --source-bundle S3Bucket="${{ env.BUCKET_NAME }}",S3Key="${{ env.PACKAGE_NAME }}" \
+            --version-label "Ver-${{ github.sha }}" \
+            --description "CommitSHA-${{ github.sha }}"
+
+      - name: Deploy our new Application Version
+        run : aws elasticbeanstalk update-environment --environment-name ${{ env.ENV_NAME }} --version-label "Ver-${{ github.sha }}"
