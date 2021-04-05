@@ -3,7 +3,7 @@ name: CI
 env:
   BUCKET_NAME : "neha-bucket123"
   APP_NAME : "neha-app"
-  ENV_NAME : "neha-env"
+  ENV_NAME : "Nehaapp-env"
   PACKAGE_NAME : "neha-${{ github.sha }}.zip"
   AWS_REGION : "us-east-2"
 
@@ -105,7 +105,7 @@ jobs:
           aws-session-token: ${{ steps.sessiontoken.outputs.SESSIONTOKEN }}
           aws-region: ${{ env.AWS_REGION }}
 
-      - name: Create new ElasticBeanstalk Applicaiton Version
+      - name: Create new ElasticBeanstalk Application Version
         run : |
             aws elasticbeanstalk create-application-version \
             --application-name ${{ env.APP_NAME }} \
