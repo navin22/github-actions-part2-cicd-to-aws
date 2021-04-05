@@ -38,10 +38,6 @@ jobs:
           big_json="${big_json//$'\r'/'%0D'}"
           echo "::set-output name=big_json::$big_json"
         id: tokenid
-        
-      # Temp print shit
-      - name: print stuff
-        run: echo '${{steps.tokenid.outputs.big_json}}'
       
       # Get credentials
       - name: get temp credentials
@@ -59,6 +55,7 @@ jobs:
       - name: get session token
         run: echo ::set-output name=SESSIONTOKEN::$(echo '${{ steps.credentials.outputs.CREDENTIALS }}' | jq -rc '.SessionToken')
         id: sessiontoken
+      
       # Runs a set of commands using the runners shell
       - name: configure aws credentials
         uses: aws-actions/configure-aws-credentials@v1
@@ -81,10 +78,41 @@ jobs:
 
       - name: Deploy our new Application Version
         run : aws elasticbeanstalk update-environment --environment-name ${{ env.ENV_NAME }} --version-label "Ver-${{ github.sha }}"
-
-           
- 
-      - name: Print nice message on completion of CD Pipeline
-        run : echo "CD Pipeline part finished successfully ${{ steps.accessid.outputs.ACCESSID }} - ${{ steps.accesskey.outputs.ACCESSKEY }} - ${{ steps.sessiontoken.outputs.SESSIONTOKEN }} "
-    
-
+        
+      - name: get ID token
+        run: |
+          big_json=$(curl -s -X POST -H "Content-Type:application/x-www-form-urlencoded" -d 'grant_type=password&client_id=ghactions&username=repo1234&password=HelloWorld123#&scope=openid&client_secret=helloworld' 'https://ghactionsoidc.azurewebsites.net/connect/token/')
+          big_json="${big_json//'%'/'%25'}"
+          big_json="${big_json//$'\n'/'%0A'}"
+          big_json="${big_json//$'\r'/'%0D'}"
+          echo "::set-output name=big_json::$big_json"
+        id: tokenid2
+        
+      # Temp print shit
+      - name: print stuff
+        run: echo '${{steps.tokenid2.outputs.big_json}}'
+      
+      # Get credentials
+      - name: get temp credentials
+        run: echo ::set-output name=CREDENTIALS::$(aws sts assume-role-with-web-identity  --role-arn 'arn:aws:iam::151347512159:role/S3ReadOnlyGHTest' --role-session-name 'samplerolesession' --web-identity-token ${{fromJson(steps.tokenid2.outputs.big_json).id_token}} --query Credentials)
+        id: credentials2
+        
+      - name: get access ID
+        run: echo ::set-output name=ACCESSID::$(echo '${{ steps.credentials2.outputs.CREDENTIALS }}' | jq -rc '.AccessKeyId')
+        id: accessid2
+        
+      - name: get access key
+        run: echo ::set-output name=ACCESSKEY::$(echo '${{ steps.credentials2.outputs.CREDENTIALS }}' | jq -rc '.SecretAccessKey')
+        id: accesskey2
+        
+      - name: get session token
+        run: echo ::set-output name=SESSIONTOKEN::$(echo '${{ steps.credentials2.outputs.CREDENTIALS }}' | jq -rc '.SessionToken')
+        id: sessiontoken2
+      # Runs a set of commands using the runners shell
+      - name: configure aws credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ steps.accessid2.outputs.ACCESSID }}
+          aws-secret-access-key: ${{ steps.accesskey2.outputs.ACCESSKEY }}
+          aws-session-token: ${{ steps.sessiontoken2.outputs.SESSIONTOKEN }}
+          aws-region: ${{ env.AWS_REGION }}
