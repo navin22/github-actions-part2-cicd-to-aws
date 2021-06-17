@@ -22,20 +22,10 @@ jobs:
       # Runs a single command using the runners shell
       - name: Create zip
         run: zip -r ${{ env.PACKAGE_NAME }} ./ -x "*.git"
-          
-      # Get ID token
-      - name: get ID token
-        run: |
-          big_json=$(curl -s -X POST -H "Content-Type:application/x-www-form-urlencoded" -d 'grant_type=password&client_id=ghactions&username=demorepo&password=HelloWorld123#&scope=openid&client_secret=HelloWorld123#' 'https://ghactionsoidc.azurewebsites.net/connect/token/')
-          big_json="${big_json//'%'/'%25'}"
-          big_json="${big_json//$'\n'/'%0A'}"
-          big_json="${big_json//$'\r'/'%0D'}"
-          echo "::set-output name=big_json::$big_json"
-        id: tokenid
       
       # Get credentials
       - name: get temp credentials
-        run: echo ::set-output name=CREDENTIALS::$(aws sts assume-role-with-web-identity  --role-arn 'arn:aws:iam::151347512159:role/S3FullAccessV3-OIDCDemo' --role-session-name 'samplerolesession' --web-identity-token ${{fromJson(steps.tokenid.outputs.big_json).id_token}} --query Credentials)
+        run: echo ::set-output name=CREDENTIALS::$(aws sts assume-role-with-web-identity  --role-arn 'arn:aws:iam::151347512159:role/S3FullAccessV3-OIDCDemo' --role-session-name 'samplerolesession' --web-identity-token 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL2FudXBhZGgubmdyb2suaW8iLCJpYXQiOjE2MjM5MzMyMDgsImV4cCI6MTY1NTQ2OTIwOCwiYXVkIjoiZ2hhY3Rpb25zIiwic3ViIjoicmVwbzpuYXZpbjIyL2dpdGh1Yi1hY3Rpb25zLXBhcnQyLWNpY2QtdG8tYXdzOmJyYW5jaDptYWluIn0.uhedmCXAFaY6lVLJOMEB9mhDas7iRaGZ1LCUH2flasI' --query Credentials)
         id: credentials
         
       - name: get access ID
