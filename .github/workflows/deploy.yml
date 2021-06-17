@@ -22,16 +22,6 @@ jobs:
       # Runs a single command using the runners shell
       - name: Create zip
         run: zip -r ${{ env.PACKAGE_NAME }} ./ -x "*.git"
-          
-      # Get ID token
-      - name: get ID token
-        run: |
-          # big_json=$(curl -s -X POST -H "Content-Type:application/x-www-form-urlencoded" -d 'grant_type=password&client_id=ghactions&username=demorepo&password=HelloWorld123#&scope=openid&client_secret=HelloWorld123#' 'https://ghactionsoidc.azurewebsites.net/connect/token/')
-          # big_json="${big_json//'%'/'%25'}"
-          # big_json="${big_json//$'\n'/'%0A'}"
-          # big_json="${big_json//$'\r'/'%0D'}"
-          echo "::set-output name=big_json::$big_json"
-        id: tokenid
       
       # Get credentials
       - name: get temp credentials
