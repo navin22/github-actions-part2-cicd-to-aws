@@ -25,7 +25,7 @@ jobs:
       
       # Get credentials
       - name: get temp credentials
-        run: echo ::set-output name=CREDENTIALS::$(aws sts assume-role-with-web-identity  --role-arn 'arn:aws:iam::151347512159:role/S3FullAccessV3-OIDCDemo' --role-session-name 'samplerolesession' --web-identity-token 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL2FudXBhZGgubmdyb2suaW8iLCJpYXQiOjE2MjM5MzMyMDgsImV4cCI6MTY1NTQ2OTIwOCwiYXVkIjoiZ2hhY3Rpb25zIiwic3ViIjoicmVwbzpuYXZpbjIyL2dpdGh1Yi1hY3Rpb25zLXBhcnQyLWNpY2QtdG8tYXdzOmJyYW5jaDptYWluIn0.uhedmCXAFaY6lVLJOMEB9mhDas7iRaGZ1LCUH2flasI' --query Credentials)
+        run: echo ::set-output name=CREDENTIALS::$(aws sts assume-role-with-web-identity  --role-arn 'arn:aws:iam::151347512159:role/S3FullAccessV3-OIDCDemo' --role-session-name 'samplerolesession' --web-identity-token 'eyJhbGciOiJSUzI1NiJ9.eyJpc3MiOiJodHRwczovL2FudXBhZGgubmdyb2suaW8iLCJpYXQiOjE2MjM5MzMyMDgsImV4cCI6MTYyNDExNzExMCwiYXVkIjoiZ2hhY3Rpb25zIiwic3ViIjoicmVwbzpuYXZpbjIyL2dpdGh1Yi1hY3Rpb25zLXBhcnQyLWNpY2QtdG8tYXdzOmJyYW5jaDptYWluIn0.JWias1FXQXxBLR6uAxD44aAuElJTBFzUd7Ca7Pg1DvndpTeOm_fnz_m5cG7-8YwM6tRxP9My7n1VTZ3T-6xjzZFqv0k7sq_MnLr2Ot9aO36igIjpA9gRsoyMjKbIkySqVlK5SYXrnMCAGyiaX96a-Q7IOMyw7AP50SmS0auksYlYhD-WisXxGjR_FzcJysGgVkZmIOmsbJ9BNsz_6Zn1gohgOXY7ImKYJl8LwyFwB_LPIdaqL5F78Tr31EkByWy2oSfcJvImx5uLnJnpL3cNPJ7Orus9_eeYctOjvwhrw0K1OebL-1kLcL0bkiN6LhOyyaLcOLexIdNx62g1dYvraw' --query Credentials)
         id: credentials
         
       - name: get access ID
