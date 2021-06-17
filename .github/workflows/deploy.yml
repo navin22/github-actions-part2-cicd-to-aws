@@ -1,5 +1,5 @@
 
-name: CI
+name: CI1
 env:
   BUCKET_NAME : "neha-bucket123"
   APP_NAME : "neha-app"
